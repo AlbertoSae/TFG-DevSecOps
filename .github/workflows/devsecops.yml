@@ -1,0 +1,73 @@
+name: DevSecOps Pipeline
+on: [push]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # 1. SEMGREP (SAST)
+  semgrep:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+    outputs:
+      findings: ${{ steps.count.outputs.findings }}
+      critical: ${{ steps.count.outputs.critical }}
+      high: ${{ steps.count.outputs.high }}
+      medium: ${{ steps.count.outputs.medium }}
+      low: ${{ steps.count.outputs.low }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Semgrep
+        run: pip install semgrep
+      - name: Run Semgrep
+        run: semgrep --config p/javascript --json --output semgrep.json . || true
+      - name: Count findings
+        id: count
+        run: |
+          HIGH=$(jq '[.results[] | select(.extra.severity=="ERROR")] | length' semgrep.json)
+          MEDIUM=$(jq '[.results[] | select(.extra.severity=="WARNING")] | length' semgrep.json)
+          echo "findings=$((HIGH+MEDIUM))" >> $GITHUB_OUTPUT
+          echo "critical=0" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+          echo "medium=$MEDIUM" >> $GITHUB_OUTPUT
+          echo "low=0" >> $GITHUB_OUTPUT
+
+  # 2. SCA (Dependencias)
+  sca:
+    name: SCA - Dependency Scan
+    runs-on: ubuntu-latest
+    outputs:
+      findings: ${{ steps.audit.outputs.findings }}
+      critical: ${{ steps.audit.outputs.critical }}
+      high: ${{ steps.audit.outputs.high }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run npm audit
+        run: npm audit --json > audit.json || true
+      - name: Count findings
+        id: audit
+        run: |
+          echo "critical=$(jq '.metadata.vulnerabilities.critical // 0' audit.json)" >> $GITHUB_OUTPUT
+          echo "high=$(jq '.metadata.vulnerabilities.high // 0' audit.json)" >> $GITHUB_OUTPUT
+          echo "findings=$(jq '.metadata.vulnerabilities.total // 0' audit.json)" >> $GITHUB_OUTPUT
+
+
+  # 4. DEPLOY (SSH)
+  deploy:
+    name: Deploy to Ubuntu Server
+    needs: [semgrep, sca]
+    runs-on: self-hosted
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/${{ secrets.SERVER_USER }}/NodeGoat
+            git pull origin main
+            docker-compose up -d --build
+            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html || true
