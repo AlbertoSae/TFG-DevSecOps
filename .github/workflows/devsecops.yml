@@ -25,7 +25,21 @@ jobs:
       - name: Install Semgrep
         run: pip install semgrep
       - name: Run Semgrep
-        run: semgrep --config p/javascript --json --output semgrep.json . || true
+        run: |
+          # 1. Ejecutamos el escaneo
+          semgrep --config p/javascript --json --output semgrep.json . || true
+          
+          # 2. IMPRIMIR LOS HALLAZGOS EN EL LOG
+          echo "DETALLE DE HALLAZGOS ENCONTRADOS:"
+          jq '.results[] | {check_id: .check_id, path: .path, severity: .extra.severity}' semgrep.json
+          
+          # 3. BLOQUEO DEL PIPELINE 
+          # Si encuentras errores (severity == ERROR), el pipeline fallará aquí
+          ERROR_COUNT=$(jq '[.results[] | select(.extra.severity=="ERROR")] | length' semgrep.json)
+          if [ "$ERROR_COUNT" -gt 0 ]; then
+            echo "¡ERROR: Se han encontrado $ERROR_COUNT vulnerabilidades críticas! Bloqueando despliegue."
+            exit 1
+          fi
       - name: Count findings
         id: count
         run: |
