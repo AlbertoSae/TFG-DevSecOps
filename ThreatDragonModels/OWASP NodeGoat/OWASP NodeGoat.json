@@ -1,0 +1,27 @@
+{
+  "version": "2.6.2",
+  "summary": {
+    "title": "OWASP NodeGoat",
+    "owner": "Alberto Saez",
+    "description": "NodeGoat es una aplicación web basada en Node.js y Express que sirve como entorno educativo para la demostración de vulnerabilidades de seguridad web, siguiendo los estándares de OWASP Top 10.\n\nLa arquitectura del sistema se compone de tres niveles:\n\nCapa de Presentación: Interfaz web desarrollada sobre Express que interactúa con el usuario a través de protocolos HTTP/HTTPS.\n\nCapa de Aplicación: Servidor Node.js que gestiona la lógica de negocio, incluyendo la autenticación de usuarios y la gestión de contribuciones financieras.\n\nCapa de Almacenamiento: Base de datos MongoDB que persiste la información de usuarios, sesiones y registros de transacciones.\n\nEl sistema procesa peticiones de usuarios externos, los cuales interactúan con la aplicación a través de un límite de confianza (Trust Boundary) definido entre el cliente web y el servidor, siendo este el vector principal de análisis para la identificación de amenazas STRIDE.",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "Modelo de Amenazas del Sistema NodeGoat",
+        "diagramType": "STRIDE",
+        "placeholder": "Descripción de nuevo diagrama STRIDE",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": [],
+        "description": "Modelo de Amenazas del Sistema NodeGoat"
+      }
+    ],
+    "diagramTop": 1,
+    "reviewer": "Alberto Saez",
+    "threatTop": 0
+  }
+}
