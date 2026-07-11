@@ -16,12 +16,625 @@
         "placeholder": "Descripción de nuevo diagrama STRIDE",
         "thumbnail": "./public/content/images/thumbnail.stride.jpg",
         "version": "2.6.2",
-        "cells": [],
+        "cells": [
+          {
+            "position": {
+              "x": 469.99999999999955,
+              "y": 50.00000000000108
+            },
+            "size": {
+              "width": 500,
+              "height": 270
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "id": "1926e3a8-f665-4b22-900b-8d32b6f7facf",
+            "zIndex": -1,
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Trust Boundary",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "6da1d801-f95c-45ca-aad5-3a86e2b39d68",
+                "e082c710-b017-4966-a40b-f11aa385daaf"
+              ],
+              "containedElements": [
+                "3ebb81a5-1511-4589-a5df-f3d05f06722f",
+                "a794ba03-7a65-4df5-9734-207134395e0b"
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 120,
+              "y": 110.00000000000006
+            },
+            "size": {
+              "width": 112.5,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "User"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "62c5d996-220d-41f9-b439-6310a0ef570b"
+                },
+                {
+                  "group": "right",
+                  "id": "0159ae11-e5c0-49b1-b628-d04f4babeb46"
+                },
+                {
+                  "group": "bottom",
+                  "id": "a7637a71-efa0-40ab-9994-5b84d5b3f7ec"
+                },
+                {
+                  "group": "left",
+                  "id": "f75c1641-1259-46e7-bc95-395a86222439"
+                }
+              ]
+            },
+            "id": "f03f3022-db8d-4859-808e-8dd599b65082",
+            "zIndex": 1,
+            "data": {
+              "type": "tm.Actor",
+              "name": "User",
+              "description": "El actor que interactúa con la aplicación.",
+              "isTrustBoundary": false,
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 470,
+              "y": 70
+            },
+            "size": {
+              "width": 130,
+              "height": 120
+            },
+            "attrs": {
+              "text": {
+                "text": "NodeGoat_Web"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "79fddf94-36b8-4475-adad-232d96f42cef"
+                },
+                {
+                  "group": "right",
+                  "id": "b43855a2-f0e7-43f9-9691-8b4585ae5c5c"
+                },
+                {
+                  "group": "bottom",
+                  "id": "d5d6480c-1a0d-4374-afc5-82fbc2cae7cc"
+                },
+                {
+                  "group": "left",
+                  "id": "a115fd0f-0612-4a2b-983d-fb9c5e955c1c"
+                }
+              ]
+            },
+            "id": "3ebb81a5-1511-4589-a5df-f3d05f06722f",
+            "zIndex": 2,
+            "data": {
+              "type": "tm.Process",
+              "name": "NodeGoat_Web",
+              "description": "Contenedor Express que maneja las peticiones y lógica.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "threats": [
+                {
+                  "id": "f849fafe-8a99-40e6-9d2d-3d19b237595c",
+                  "title": "Open Redirect en recursos de aprendizaje.",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure / Brecha de información",
+                  "description": "El parámetro url en /learn no está validado contra una lista de dominios permitidos. Esto permite a un atacante redirigir a los usuarios hacia dominios externos maliciosos bajo la apariencia de un enlace oficial, facilitando campañas de phishing.",
+                  "mitigation": "- Utilizar una \"lista blanca\" (allow-list) de dominios permitidos para redirecciones.\n\n- Implementar una página de advertencia intermedia antes de redirigir al usuario fuera del dominio.\n\n- Eliminar el uso de parámetros de URL dinámicos para redirecciones siempre que sea posible.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 5,
+                  "score": "4.7"
+                }
+              ],
+              "threatFrequency": {
+                "spoofing": 0,
+                "tampering": 0,
+                "repudiation": 0,
+                "informationDisclosure": 1,
+                "denialOfService": 0,
+                "elevationOfPrivilege": 0
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 800,
+              "y": 210
+            },
+            "size": {
+              "width": 120,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "MongoDB"
+              },
+              "topLine": {
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "256f566a-c057-4d2d-8819-283e4f97702d"
+                },
+                {
+                  "group": "right",
+                  "id": "7d6f42fc-2322-4e14-9cc2-20beb5f3dbb8"
+                },
+                {
+                  "group": "bottom",
+                  "id": "8b3349b6-f278-4483-9cb5-81c7315ff969"
+                },
+                {
+                  "group": "left",
+                  "id": "0a7905e7-35d5-4328-bef1-9649db3add11"
+                }
+              ]
+            },
+            "id": "a794ba03-7a65-4df5-9734-207134395e0b",
+            "zIndex": 3,
+            "data": {
+              "type": "tm.Store",
+              "name": "MongoDB",
+              "description": "Base de datos donde residen las credenciales y los datos de contribuciones.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Petición HTTP",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "http",
+              "threats": [
+                {
+                  "id": "5a54eddb-c175-40a4-a64d-704283a9a2fe",
+                  "title": "Inyección de Scripts (XSS) mediante parámetros de usuario.",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering / Manipulación",
+                  "description": "Falta de sanitización en el campo userName del login. Permite que un atacante inyecte código JS que se ejecuta en el navegador de la víctima, pudiendo robar la cookie connect.sid y suplantar al usuario legítimo.",
+                  "mitigation": "- Implementar un Content Security Policy (CSP) robusto.\n\n- Sanitizar toda la salida de datos del lado del cliente.\n\n- Configurar la cookie de sesión como HttpOnly, Secure y SameSite=Lax/Strict.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 3,
+                  "score": "7.1"
+                }
+              ],
+              "trustBoundaryIds": [
+                "1926e3a8-f665-4b22-900b-8d32b6f7facf"
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "informationDisclosure": 0,
+                "denialOfService": 0
+              }
+            },
+            "labels": [
+              "Petición HTTP"
+            ],
+            "id": "6da1d801-f95c-45ca-aad5-3a86e2b39d68",
+            "source": {
+              "cell": "f03f3022-db8d-4859-808e-8dd599b65082",
+              "port": "0159ae11-e5c0-49b1-b628-d04f4babeb46"
+            },
+            "target": {
+              "cell": "3ebb81a5-1511-4589-a5df-f3d05f06722f",
+              "port": "a115fd0f-0612-4a2b-983d-fb9c5e955c1c"
+            },
+            "vertices": [
+              {
+                "x": 400,
+                "y": 120
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Consulta/Escritura de datos",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "14df22fa-16b5-45b1-9d39-d77e7a0a5b2c",
+                  "title": "Inyección SQL en parámetros de contribución",
+                  "status": "Open",
+                  "severity": "Critical",
+                  "type": "Tampering / Manipulación",
+                  "description": "El atacante manipula el parámetro preTax en el formulario de contribuciones para inyectar sentencias SQL. El servidor procesa esta entrada sin validación, permitiendo el acceso, modificación o borrado de datos en la base de datos MongoDB.",
+                  "mitigation": "- Implementar consultas parametrizadas (Prepared Statements).\n\n- Validación estricta de tipos de datos en el servidor (asegurar que solo lleguen números).\n\n- Principio de menor privilegio para el usuario de base de datos de la aplicación.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 2,
+                  "score": "9.8"
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "tampering": 1,
+                "informationDisclosure": 0,
+                "denialOfService": 0
+              }
+            },
+            "labels": [
+              "Consulta/Escritura de datos"
+            ],
+            "id": "87c68972-a89b-4520-a8ca-ad36a21964f8",
+            "source": {
+              "cell": "3ebb81a5-1511-4589-a5df-f3d05f06722f",
+              "port": "b43855a2-f0e7-43f9-9691-8b4585ae5c5c"
+            },
+            "target": {
+              "cell": "a794ba03-7a65-4df5-9734-207134395e0b",
+              "port": "0a7905e7-35d5-4328-bef1-9649db3add11"
+            },
+            "vertices": [
+              {
+                "x": 700,
+                "y": 180
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Respuesta Http",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "http",
+              "threats": [],
+              "trustBoundaryIds": [
+                "1926e3a8-f665-4b22-900b-8d32b6f7facf"
+              ]
+            },
+            "labels": [
+              "Respuesta Http"
+            ],
+            "id": "e082c710-b017-4966-a40b-f11aa385daaf",
+            "source": {
+              "cell": "3ebb81a5-1511-4589-a5df-f3d05f06722f",
+              "port": "d5d6480c-1a0d-4374-afc5-82fbc2cae7cc"
+            },
+            "target": {
+              "cell": "f03f3022-db8d-4859-808e-8dd599b65082",
+              "port": "a7637a71-efa0-40ab-9994-5b84d5b3f7ec"
+            },
+            "vertices": [
+              {
+                "x": 360,
+                "y": 240
+              }
+            ]
+          }
+        ],
         "description": "Modelo de Amenazas del Sistema NodeGoat"
       }
     ],
     "diagramTop": 1,
     "reviewer": "Alberto Saez",
-    "threatTop": 0
+    "threatTop": 5
   }
 }
