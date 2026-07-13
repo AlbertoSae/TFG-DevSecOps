@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run npm audit
-        run: npm audit --json > audit.json || true
+        run: npm audit --json | tee audit.json
       - name: Count findings
         id: audit
         run: |
