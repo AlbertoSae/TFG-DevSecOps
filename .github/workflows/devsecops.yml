@@ -86,8 +86,8 @@ jobs:
           script: |
             cd /home/${{ secrets.SERVER_USER }}/NodeGoat
             git pull origin main
-            docker-compose up -d --build
+            docker compose up -d --build
             sleep 10
-            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html -spider
-            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html -scans
+            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html
+            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html 
 
