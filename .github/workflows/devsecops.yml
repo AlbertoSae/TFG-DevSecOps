@@ -2,7 +2,7 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ fix/sec-pipeline ]
+    branches: [ fix-initialVulns ]
   workflow_dispatch:
 
 permissions:
