@@ -2,7 +2,7 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ feature/remediacion-criticos ]
   workflow_dispatch:
 
 permissions:
