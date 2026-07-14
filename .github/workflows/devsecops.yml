@@ -1,80 +1,174 @@
 name: DevSecOps Pipeline
+
 on:
   push:
-    branches: [ feature/remediacion-criticos ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
   issues: write
+  security-events: write   # necesario para subir SARIF a la pestaña Security
+
+env:
+  IMAGE_NAME: nodegoat
+  REGISTRY: ghcr.io
 
 jobs:
-  # 1. SEMGREP (SAST)
+
+  # ────────────────────────────────────────────────
+  # 1. SAST - Semgrep
+  # ────────────────────────────────────────────────
   semgrep:
     name: SAST - Semgrep
     runs-on: ubuntu-latest
-    outputs:
-      findings: ${{ steps.count.outputs.findings }}
-      critical: ${{ steps.count.outputs.critical }}
-      high: ${{ steps.count.outputs.high }}
-      medium: ${{ steps.count.outputs.medium }}
-      low: ${{ steps.count.outputs.low }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Semgrep
         run: pip install semgrep
+
       - name: Run Semgrep
         run: |
-          # 1. Ejecutamos el escaneo
-          semgrep --config p/javascript --json --output semgrep.json . || true
-          
-          # 2. IMPRIMIR LOS HALLAZGOS EN EL LOG
-          echo "DETALLE DE HALLAZGOS ENCONTRADOS:"
+          semgrep \
+            --config p/javascript \
+            --config p/owasp-top-ten \
+            --config p/security-audit \
+            --config p/dockerfile \
+            --json --output semgrep.json .
+
+          echo "DETALLE DE HALLAZGOS:"
           jq '.results[] | {check_id: .check_id, path: .path, severity: .extra.severity}' semgrep.json
-          
-          # 3. BLOQUEO DEL PIPELINE 
-          # Si encuentras errores (severity == ERROR), el pipeline fallará aquí
+
+      - name: Evaluate gate
+        run: |
           ERROR_COUNT=$(jq '[.results[] | select(.extra.severity=="ERROR")] | length' semgrep.json)
+          WARNING_COUNT=$(jq '[.results[] | select(.extra.severity=="WARNING")] | length' semgrep.json)
+          echo "Críticas (ERROR): $ERROR_COUNT | Medias (WARNING): $WARNING_COUNT"
           if [ "$ERROR_COUNT" -gt 0 ]; then
-            echo "¡ERROR: Se han encontrado $ERROR_COUNT vulnerabilidades críticas! Bloqueando despliegue."
+            echo "::error:: Se encontraron $ERROR_COUNT hallazgos críticos de SAST. Bloqueando pipeline."
             exit 1
           fi
-      - name: Count findings
-        id: count
-        run: |
-          HIGH=$(jq '[.results[] | select(.extra.severity=="ERROR")] | length' semgrep.json)
-          MEDIUM=$(jq '[.results[] | select(.extra.severity=="WARNING")] | length' semgrep.json)
-          echo "findings=$((HIGH+MEDIUM))" >> $GITHUB_OUTPUT
-          echo "critical=0" >> $GITHUB_OUTPUT
-          echo "high=$HIGH" >> $GITHUB_OUTPUT
-          echo "medium=$MEDIUM" >> $GITHUB_OUTPUT
-          echo "low=0" >> $GITHUB_OUTPUT
 
-  # 2. SCA (Dependencias)
+      - name: Upload Semgrep report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep.json
+
+  # ────────────────────────────────────────────────
+  # 2. Detección de secretos - Gitleaks
+  # ────────────────────────────────────────────────
+  secrets-scan:
+    name: Secrets Scan - Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # necesario para escanear todo el historial
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: true
+        # gitleaks-action falla el step automáticamente (exit 1) si detecta secretos
+
+  # ────────────────────────────────────────────────
+  # 3. SCA - Análisis de dependencias
+  # ────────────────────────────────────────────────
   sca:
     name: SCA - Dependency Scan
     runs-on: ubuntu-latest
-    outputs:
-      findings: ${{ steps.audit.outputs.findings }}
-      critical: ${{ steps.audit.outputs.critical }}
-      high: ${{ steps.audit.outputs.high }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run npm audit
-        run: npm audit --json | tee audit.json
-      - name: Count findings
-        id: audit
+        run: npm audit --json > audit.json || true
+
+      - name: Evaluate gate
         run: |
-          echo "critical=$(jq '.metadata.vulnerabilities.critical // 0' audit.json)" >> $GITHUB_OUTPUT
-          echo "high=$(jq '.metadata.vulnerabilities.high // 0' audit.json)" >> $GITHUB_OUTPUT
-          echo "findings=$(jq '.metadata.vulnerabilities.total // 0' audit.json)" >> $GITHUB_OUTPUT
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit.json)
+          TOTAL=$(jq '.metadata.vulnerabilities.total // 0' audit.json)
+          echo "Críticas: $CRITICAL | Altas: $HIGH | Total: $TOTAL"
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "::error:: Se encontraron vulnerabilidades críticas/altas en dependencias. Bloqueando pipeline."
+            exit 1
+          fi
 
+      - name: Upload SCA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-report
+          path: audit.json
 
-  # 4. DEPLOY (SSH)
+  # ────────────────────────────────────────────────
+  # 4. Build + Scan de imagen Docker
+  # ────────────────────────────────────────────────
+  docker-build-scan:
+    name: Build & Scan Docker Image
+    needs: [semgrep, secrets-scan, sca]
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
+
+      - name: Set image tag
+        id: meta
+        run: echo "tag=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        run: docker build -t ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} .
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '1'          # bloquea el pipeline si hay CRITICAL/HIGH
+          ignore-unfixed: true    # opcional: ignora CVEs sin parche disponible
+
+      - name: Log in to registry
+        if: success()
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image
+        if: success()
+        run: |
+          docker tag ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} \
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
+          docker push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
+
+  # ────────────────────────────────────────────────
+  # 5. Deploy - solo si todos los análisis previos pasaron
+  # ────────────────────────────────────────────────
   deploy:
     name: Deploy to Ubuntu Server
-    needs: [semgrep, sca]
+    needs: [docker-build-scan]
     runs-on: self-hosted
     steps:
       - name: Deploy via SSH
@@ -86,8 +180,44 @@ jobs:
           script: |
             cd /home/${{ secrets.SERVER_USER }}/NodeGoat
             git pull origin main
-            docker compose up -d --build
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.docker-build-scan.outputs.image_tag }}
+            docker-compose up -d
             sleep 10
-            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html
-            /snap/bin/zaproxy -cmd -quickurl http://localhost:4000 -quickout /home/${{ secrets.SERVER_USER }}/zap-report.html 
 
+  # ────────────────────────────────────────────────
+  # 6. DAST post-despliegue - OWASP ZAP
+  # ────────────────────────────────────────────────
+  dast:
+    name: DAST - OWASP ZAP
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run ZAP Baseline Scan
+        id: zap
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://${{ secrets.SERVER_IP }}:4000'
+          # -a: spider agresivo | -j: usar ajax spider | fail_action controla el gate
+          cmd_options: '-a'
+          fail_action: true   # falla el job si ZAP encuentra alertas de riesgo alto
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: |
+            report_html.html
+            report_json.json
+
+      - name: Create issue on failed DAST
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `DAST: vulnerabilidades detectadas en ${context.sha}`,
+              body: 'El escaneo OWASP ZAP post-despliegue encontró hallazgos de riesgo alto. Revisa el artifact zap-report.'
+            })
