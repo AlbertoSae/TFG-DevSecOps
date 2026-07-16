@@ -95,12 +95,12 @@ jobs:
 
       - name: Run npm audit
         run: |
-        # Ejecutamos el comando pero redirigimos el error para que NO detenga el pipeline
-        # Usamos '|| true' para que el paso siempre se marque como exitoso
-        npm audit --json > audit.json || true
+          # Ejecutamos el comando pero redirigimos el error para que NO detenga el pipeline
+          # Usamos '|| true' para que el paso siempre se marque como exitoso
+          npm audit --json > audit.json || true
         
-        # Opcional: imprimir el mensaje para que quede registro en el log
-        echo "Análisis SCA completado. Ignorando vulnerabilidades de dependencias legacy."
+          # Opcional: imprimir el mensaje para que quede registro en el log
+          echo "Análisis SCA completado. Ignorando vulnerabilidades de dependencias legacy."
 
       - name: Evaluate gate
         run: |
