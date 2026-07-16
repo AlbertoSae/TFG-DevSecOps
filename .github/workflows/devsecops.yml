@@ -94,7 +94,7 @@ jobs:
         run: npm ci
 
       - name: Run npm audit
-        run:|
+        run: |
         # Ejecutamos el comando pero redirigimos el error para que NO detenga el pipeline
         # Usamos '|| true' para que el paso siempre se marque como exitoso
         npm audit --json > audit.json || true
