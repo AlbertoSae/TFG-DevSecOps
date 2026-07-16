@@ -116,8 +116,9 @@ function SessionHandler(db) {
             req.session.regenerate(() => {
             req.session.userId = user._id;
             return res.redirect(user.isAdmin ? "/benefits" : "/dashboard");
+            });
         });
-    });
+    };
 
     this.displayLogoutPage = (req, res) => {
         req.session.destroy(() => res.redirect("/"));
