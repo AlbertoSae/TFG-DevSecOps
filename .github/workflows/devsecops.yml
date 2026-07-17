@@ -212,15 +212,34 @@ jobs:
           node-version: '20'
 
       - name: Start Environment
-        run: docker compose -f docker-compose.test.yml up -d
+        run: |
+          docker compose -f docker-compose.test.yml up -d
+          # Esperar a que los contenedores arranquen correctamente
+          echo "Esperando a que la aplicación esté disponible..."
+          for i in {1..20}; do
+            if curl -s http://localhost:4001 > /dev/null; then
+              echo "App lista en 4001"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Check Environment
+        run: |
+          echo "Verificando contenedores activos:"
+          docker ps
 
       - name: Run ZAP Scan
         run: |
-          # ZAP ahora escanea el puerto 4001 y Docker hace la magia del mapeo
+          mkdir -p zap_reports
+          sudo chmod -R 777 zap_reports
+          
+          # Lanzar ZAP asegurando permisos y apuntando a 127.0.0.1
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
+            --user root \
             --network host \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:4001 ...
+            zap-baseline.py -t http://127.0.0.1:4001 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
 
       - name: Upload ZAP report
         if: always()
