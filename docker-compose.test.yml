@@ -3,10 +3,11 @@ services:
     image: mongo:4.4
   app:
     build: .
-    # Forzamos el puerto mediante PORT y un pequeño delay para evitar el doble bind
-    command: /bin/sh -c "apk add --no-cache openssl && mkdir -p artifacts/cert && openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj '/CN=localhost' && PORT=4001 npm start"
+    user: root  # Forzamos ejecución como root
+    # Ya no necesitamos el apk add aquí, solo el certificado y el inicio
+    command: /bin/sh -c "mkdir -p artifacts/cert && openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj '/CN=localhost' && PORT=4001 npm start"
     ports:
-      - "4001:4001" 
+      - "4001:4001"
     depends_on:
       - db
     environment:
