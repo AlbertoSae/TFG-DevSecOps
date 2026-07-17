@@ -1,0 +1,19 @@
+services:
+  db:
+    image: mongo:4.4
+    networks:
+      - test-net
+  app:
+    build: .
+    ports:
+      - "4001:4000"  # Mapea el 4001 del host al 4000 del contenedor
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/nodegoat
+    networks:
+      - test-net
+
+networks:
+  test-net:
+    driver: bridge

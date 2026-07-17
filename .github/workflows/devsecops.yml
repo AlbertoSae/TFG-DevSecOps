@@ -210,33 +210,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run ZAP Baseline Scan
-        run: |
-          mkdir -p zap_reports
-          sudo chmod 777 zap_reports
-          mkdir -p artifacts/cert
-          openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
-          
-          # 1. Forzamos puerto 4001 para evitar conflictos
-          echo "Arrancando la aplicación en puerto 4001..."
-          PORT=4001 nohup npm start > app.log 2>&1 &
-          
-          # 2. Esperar al puerto 4001
-          echo "Esperando al puerto 4001..."
-          for i in {1..20}; do
-            if nc -z localhost 4001; then 
-               echo "Servidor listo en 4001!"
-               break
-            fi
-            sleep 5
-          done
 
-          # 3. Lanzar ZAP contra el puerto 4001
+      - name: Start Environment
+        run: docker-compose -f docker-compose.test.yml up -d
+
+      - name: Run ZAP Scan
+        run: |
+          # ZAP ahora escanea el puerto 4001 y Docker hace la magia del mapeo
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
-            --user root \
-            --network=host \
+            --network host \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:4001 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
+            zap-baseline.py -t http://localhost:4001 ...
 
       - name: Upload ZAP report
         if: always()
