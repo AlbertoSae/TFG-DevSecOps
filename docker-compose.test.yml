@@ -14,3 +14,4 @@ services:
       - MONGODB_URI=mongodb://db:27017/nodegoat
     tty: true
     stdin_open: true
+
