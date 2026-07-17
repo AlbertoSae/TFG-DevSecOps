@@ -220,19 +220,33 @@ jobs:
             sleep 3
           done
 
-      - name: ZAP Baseline Scan
+      - name: Run ZAP Baseline Scan
         run: |
-          # 1. Creamos el directorio de reportes
+          # 1. Preparar directorio
           mkdir -p zap_reports
           sudo chmod 777 zap_reports
           
-          # 2. Ejecutamos ZAP (el --network=host conecta al localhost del runner)
+          # 2. Levantar la aplicación en segundo plano con un log para depurar
+          echo "Arrancando la aplicación..."
+          nohup npm start > app.log 2>&1 &
+          
+          # 3. Esperar activamente a que el puerto 4000 responda
+          echo "Esperando a que el servidor esté listo..."
+          for i in {1..30}; do
+            if nc -z localhost 4000; then
+              echo "Servidor detectado en puerto 4000"
+              break
+            fi
+            sleep 2
+            if [ $i -eq 30 ]; then echo "Timeout: La aplicación no arrancó"; exit 1; fi
+          done
+          
+          # 4. Lanzar ZAP
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network=host \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py -t http://localhost:4000 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
-
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@v4
