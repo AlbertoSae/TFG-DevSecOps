@@ -192,7 +192,7 @@ jobs:
   # ────────────────────────────────────────────────
   # 6. DAST post-despliegue - OWASP ZAP
   # ────────────────────────────────────────────────
-dast:
+  dast:
     name: DAST - OWASP ZAP
     needs: [deploy]
     runs-on: ubuntu-latest
