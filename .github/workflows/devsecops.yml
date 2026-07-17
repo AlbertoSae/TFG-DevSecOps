@@ -228,13 +228,20 @@ jobs:
         run: |
           echo "Verificando contenedores activos:"
           docker ps
+      - name: Debug App Logs
+        run: |
+          echo "Logs de la aplicación:"
+          docker compose -f docker-compose.test.yml logs app
+          echo "Estado de los puertos en el runner:"
+          sudo netstat -tulpn | grep 4001
 
       - name: Run ZAP Scan
         run: |
           mkdir -p zap_reports
           sudo chmod -R 777 zap_reports
           
-          # Lanzar ZAP asegurando permisos y apuntando a 127.0.0.1
+          # Cambiamos --network host por --network container:<nombre_contenedor>
+          # Pero primero, vamos a usar el nombre del servicio del compose
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network host \
