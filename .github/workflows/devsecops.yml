@@ -249,7 +249,7 @@ jobs:
             --user root \
             --network host \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://127.0.0.1:4001 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
+            zap-baseline.py -t http://127.0.0.1:4002 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
 
       - name: Upload ZAP report
         if: always()
