@@ -217,7 +217,7 @@ jobs:
           docker compose -f docker-compose.test.yml up -d
           
           # Esperamos 5 segundos para que los procesos intenten arrancar
-          sleep 5
+          sleep 15
           
           # Esto nos dirá exactamente por qué 'app' no está en la lista de 'docker ps'
           echo "--- LOGS DE ERROR DE LA APP ---"
