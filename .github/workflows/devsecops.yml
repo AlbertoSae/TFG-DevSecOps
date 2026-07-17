@@ -176,13 +176,18 @@ jobs:
       - name: Push image
         if: success()
         run: |
-          # Convertimos el nombre del repositorio a minúsculas usando tr
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          # 1. Convertimos todo a minúsculas, incluyendo el usuario y el repo
+          FULL_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           
-          # Definimos el nombre final de la imagen
-          TARGET_IMAGE="${{ env.REGISTRY }}/${REPO_LOWER}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}"
+          # 2. Convertimos el nombre de la imagen a minúsculas (por si acaso)
+          IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
           
-          # Etiquetamos y enviamos
+          # 3. Construimos el nombre final
+          TARGET_IMAGE="${{ env.REGISTRY }}/${FULL_REPO}/${IMAGE_NAME_LOWER}:${{ steps.meta.outputs.tag }}"
+          
+          echo "Etiquetando como: $TARGET_IMAGE"
+          
+          # 4. Etiquetar y subir
           docker tag ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
           docker push $TARGET_IMAGE
   # ────────────────────────────────────────────────
