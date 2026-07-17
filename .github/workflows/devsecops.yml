@@ -176,19 +176,21 @@ jobs:
       - name: Push image
         if: success()
         run: |
-          # 1. Convertimos todo a minúsculas, incluyendo el usuario y el repo
-          FULL_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          
-          # 2. Convertimos el nombre de la imagen a minúsculas (por si acaso)
+          # 1. Definimos las variables puramente en Bash, forzando minúsculas
+          REGISTRY_LOWER=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          TAG="${{ steps.meta.outputs.tag }}"
           
-          # 3. Construimos el nombre final
-          TARGET_IMAGE="${{ env.REGISTRY }}/${FULL_REPO}/${IMAGE_NAME_LOWER}:${{ steps.meta.outputs.tag }}"
+          # 2. Construimos la ruta completa en minúsculas
+          TARGET_IMAGE="${REGISTRY_LOWER}/${REPO_LOWER}/${IMAGE_NAME_LOWER}:${TAG}"
           
-          echo "Etiquetando como: $TARGET_IMAGE"
+          # 3. La imagen local también debe ser minúsculas para que coincida
+          LOCAL_IMAGE=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
           
-          # 4. Etiquetar y subir
-          docker tag ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
+          echo "Etiquetando: ${LOCAL_IMAGE}:${TAG} -> ${TARGET_IMAGE}"
+          
+          docker tag ${LOCAL_IMAGE}:${TAG} $TARGET_IMAGE
           docker push $TARGET_IMAGE
   # ────────────────────────────────────────────────
   # 5. Deploy - solo si todos los análisis previos pasaron
