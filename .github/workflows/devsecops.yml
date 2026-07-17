@@ -218,33 +218,36 @@ jobs:
           mkdir -p artifacts/cert
           openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
           
-          # Arrancamos la app y le damos un momento para morir si tiene un error
+          # 1. INSTALAR DEPENDENCIAS (Aquí estaba el fallo)
+          echo "Instalando dependencias..."
+          npm install
+          
+          # 2. Arrancamos la app
           echo "Arrancando la aplicación..."
-          npm start > app.log 2>&1 &
+          nohup npm start > app.log 2>&1 &
           
-          # Esperamos 10 segundos
+          # 3. Comprobamos si el proceso sigue vivo
           sleep 10
-          
-          # Comprobamos si el proceso sigue vivo
           if ! pgrep -f "node server.js" > /dev/null; then
              echo "--- ERROR: La aplicación murió inmediatamente ---"
              cat app.log
              exit 1
           fi
           
-          # Si sigue vivo, esperamos a que el puerto 4000 abra
+          # 4. Esperar a que el puerto 4000 abra
           echo "Esperando puerto 4000..."
           for i in {1..20}; do
             if nc -z localhost 4000; then break; fi
             sleep 3
           done
 
-          # Lanzar ZAP
+          # 5. Lanzar ZAP
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network=host \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py -t http://localhost:4000 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
+
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@v4
