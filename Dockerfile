@@ -3,6 +3,8 @@ ENV WORKDIR /usr/src/app/
 WORKDIR $WORKDIR
 COPY package*.json $WORKDIR
 RUN npm install --production --no-cache
+RUN sed -i 's/4001/4002/g' config/env/all.js
+COPY . .
 USER root
 RUN apk add --no-cache openssl
 FROM node:12-alpine
