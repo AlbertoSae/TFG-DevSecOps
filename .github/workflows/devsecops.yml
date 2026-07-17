@@ -210,7 +210,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Run ZAP Baseline Scan
         run: |
           mkdir -p zap_reports
@@ -218,33 +217,27 @@ jobs:
           mkdir -p artifacts/cert
           openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
           
-          # 1. LIMPIEZA NUCLEAR DEL PUERTO 4000
-          echo "Limpiando puerto 4000..."
-          sudo lsof -t -i:4000 | xargs -r sudo kill -9
+          # 1. Forzamos puerto 4001 para evitar conflictos
+          echo "Arrancando la aplicación en puerto 4001..."
+          PORT=4001 nohup npm start > app.log 2>&1 &
           
-          # 2. Instalar dependencias
-          npm install
-          
-          # 3. Arrancar la aplicación
-          echo "Arrancando la aplicación..."
-          nohup npm start > app.log 2>&1 &
-          
-          # 4. Esperar al puerto 4000
-          echo "Esperando al puerto 4000..."
+          # 2. Esperar al puerto 4001
+          echo "Esperando al puerto 4001..."
           for i in {1..20}; do
-            if nc -z localhost 4000; then 
-               echo "Servidor listo!"
+            if nc -z localhost 4001; then 
+               echo "Servidor listo en 4001!"
                break
             fi
-            sleep 3
+            sleep 5
           done
 
-          # 5. Lanzar ZAP
+          # 3. Lanzar ZAP contra el puerto 4001
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network=host \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:4000 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
+            zap-baseline.py -t http://localhost:4001 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
+
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@v4
