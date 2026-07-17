@@ -1,7 +1,8 @@
 services:
+  db:
+    image: mongo:4.4
   app:
     build: .
-    # Creamos la carpeta y el certificado autofirmado antes de arrancar la app
     command: /bin/sh -c "mkdir -p artifacts/cert && openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj '/CN=localhost' && npm start"
     ports:
       - "4001:4000"
