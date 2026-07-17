@@ -217,7 +217,9 @@ jobs:
           sudo chmod 777 zap_reports
           mkdir -p artifacts/cert
           openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
-          
+          #0. Liberar puerto
+          echo "Liberando puerto 4000..."
+          sudo fuser -k 4000/tcp || true
           # 1. INSTALAR DEPENDENCIAS (Aquí estaba el fallo)
           echo "Instalando dependencias..."
           npm install
