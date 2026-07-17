@@ -170,15 +170,16 @@ jobs:
       - name: Push image
         if: success()
         run: |
-          # Hardcodeamos los nombres en minúsculas
-          TARGET_IMAGE="ghcr.io/albertosae/tfg-devsecops/nodegoat:${{ steps.meta.outputs.tag }}"
+          # 1. Definimos el nombre exacto que GitHub permite escribir por defecto
+          # Esto siempre apunta a ghcr.io/albertosae/tfg-devsecops/nodegoat
+          IMAGE_PATH="ghcr.io/${{ github.repository | downcase }}/nodegoat"
+          TAG="${{ steps.meta.outputs.tag }}"
           
-          # Etiquetamos la imagen local 
-          docker tag nodegoat:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
+          # 2. Etiquetamos
+          docker tag nodegoat:$TAG $IMAGE_PATH:$TAG
           
-          # Subimos al registro
-          docker push $TARGET_IMAGE
-
+          # 3. Subimos (esta vez debería funcionar)
+          docker push $IMAGE_PATH:$TAG
   # ────────────────────────────────────────────────
   # 5. Deploy - solo si todos los análisis previos pasaron
   # ────────────────────────────────────────────────
