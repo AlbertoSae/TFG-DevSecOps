@@ -228,7 +228,7 @@ jobs:
           # 4. Esperar al puerto 4000...
           for i in {1..30}; do
             if nc -z localhost 4000; then break; fi
-            sleep 2
+            sleep 4
           done
           
           # 5. Lanzar ZAP
