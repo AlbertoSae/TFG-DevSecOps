@@ -176,22 +176,15 @@ jobs:
       - name: Push image
         if: success()
         run: |
-          # 1. Definimos las variables puramente en Bash, forzando minúsculas
-          REGISTRY_LOWER=$(echo "${{ env.REGISTRY }}" | tr '[:upper:]' '[:lower:]')
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          TAG="${{ steps.meta.outputs.tag }}"
+          # Hardcodeamos los nombres en minúsculas
+          TARGET_IMAGE="ghcr.io/albertosae/tfg-devsecops/nodegoat:${{ steps.meta.outputs.tag }}"
           
-          # 2. Construimos la ruta completa en minúsculas
-          TARGET_IMAGE="${REGISTRY_LOWER}/${REPO_LOWER}/${IMAGE_NAME_LOWER}:${TAG}"
+          # Etiquetamos la imagen local (asegúrate de que sea 'nodegoat' a secas si así la construiste)
+          docker tag nodegoat:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
           
-          # 3. La imagen local también debe ser minúsculas para que coincida
-          LOCAL_IMAGE=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          
-          echo "Etiquetando: ${LOCAL_IMAGE}:${TAG} -> ${TARGET_IMAGE}"
-          
-          docker tag ${LOCAL_IMAGE}:${TAG} $TARGET_IMAGE
+          # Subimos al registro
           docker push $TARGET_IMAGE
+
   # ────────────────────────────────────────────────
   # 5. Deploy - solo si todos los análisis previos pasaron
   # ────────────────────────────────────────────────
