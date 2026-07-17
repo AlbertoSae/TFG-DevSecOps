@@ -170,13 +170,6 @@ jobs:
       - name: Push image
         if: success()
         run: |
-          docker tag ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} \
-            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
-          docker push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
-
-      - name: Push image
-        if: success()
-        run: |
           # Hardcodeamos los nombres en minúsculas
           TARGET_IMAGE="ghcr.io/albertosae/tfg-devsecops/nodegoat:${{ steps.meta.outputs.tag }}"
           
