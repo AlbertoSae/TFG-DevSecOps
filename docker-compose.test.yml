@@ -1,19 +1,14 @@
 services:
   db:
     image: mongo:4.4
-    networks:
-      - test-net
   app:
     build: .
+    command: npm start
     ports:
-      - "4001:4000"  # Mapea el 4001 del host al 4000 del contenedor
+      - "4001:4000"
     depends_on:
       - db
     environment:
       - MONGODB_URI=mongodb://db:27017/nodegoat
-    networks:
-      - test-net
-
-networks:
-  test-net:
-    driver: bridge
+    tty: true
+    stdin_open: true
