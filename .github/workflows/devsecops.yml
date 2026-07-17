@@ -14,6 +14,7 @@ permissions:
 env:
   IMAGE_NAME: nodegoat
   REGISTRY: ghcr.io
+  REPO_PATH: albertosae/tfg-devsecops
 
 jobs:
 
@@ -179,7 +180,7 @@ jobs:
           # Hardcodeamos los nombres en minúsculas
           TARGET_IMAGE="ghcr.io/albertosae/tfg-devsecops/nodegoat:${{ steps.meta.outputs.tag }}"
           
-          # Etiquetamos la imagen local (asegúrate de que sea 'nodegoat' a secas si así la construiste)
+          # Etiquetamos la imagen local 
           docker tag nodegoat:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
           
           # Subimos al registro
