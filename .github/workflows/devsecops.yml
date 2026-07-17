@@ -200,15 +200,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and Start Application
+        run: |
+          npm install
+          # Levantamos la aplicación en segundo plano
+          npm start &
+          # Esperamos hasta 30 segundos a que el puerto 4000 esté escuchando
+          echo "Esperando a que la aplicación inicie en el puerto 4000..."
+          for i in {1..10}; do
+            if curl -s http://localhost:4000 > /dev/null; then
+              echo "Aplicación iniciada correctamente."
+              break
+            fi
+            sleep 3
+          done
+
       - name: ZAP Baseline Scan
         run: |
-          # 1. Creamos el directorio de reportes con permisos totales
+          # 1. Creamos el directorio de reportes
           mkdir -p zap_reports
           sudo chmod 777 zap_reports
           
-          # 2. Ejecutamos el contenedor de ZAP directamente
-          # --user root: evita el error de "Permission denied" al escribir el reporte
-          # --network=host: permite que ZAP vea el localhost:4000
+          # 2. Ejecutamos ZAP (el --network=host conecta al localhost del runner)
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network=host \
