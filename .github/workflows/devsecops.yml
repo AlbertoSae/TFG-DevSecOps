@@ -173,19 +173,18 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
           docker push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
 
-      - name: Prepare lowercase repo name
-        id: prep
-        run: echo "repo_lower=${{ github.repository | downcase }}" >> "$GITHUB_OUTPUT"
-
       - name: Push image
         if: success()
         run: |
-          # Usamos el nombre en minúsculas recién generado
-          TARGET_IMAGE="${{ env.REGISTRY }}/${{ steps.prep.outputs.repo_lower }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}"
+          # Convertimos el nombre del repositorio a minúsculas usando tr
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           
+          # Definimos el nombre final de la imagen
+          TARGET_IMAGE="${{ env.REGISTRY }}/${REPO_LOWER}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}"
+          
+          # Etiquetamos y enviamos
           docker tag ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }} $TARGET_IMAGE
           docker push $TARGET_IMAGE
-
   # ────────────────────────────────────────────────
   # 5. Deploy - solo si todos los análisis previos pasaron
   # ────────────────────────────────────────────────
