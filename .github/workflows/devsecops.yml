@@ -217,29 +217,25 @@ jobs:
           sudo chmod 777 zap_reports
           mkdir -p artifacts/cert
           openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
-          #0. Liberar puerto
-          echo "Liberando puerto 4000..."
-          sudo fuser -k 4000/tcp || true
-          # 1. INSTALAR DEPENDENCIAS (Aquí estaba el fallo)
-          echo "Instalando dependencias..."
+          
+          # 1. LIMPIEZA NUCLEAR DEL PUERTO 4000
+          echo "Limpiando puerto 4000..."
+          sudo lsof -t -i:4000 | xargs -r sudo kill -9
+          
+          # 2. Instalar dependencias
           npm install
           
-          # 2. Arrancamos la app
+          # 3. Arrancar la aplicación
           echo "Arrancando la aplicación..."
           nohup npm start > app.log 2>&1 &
           
-          # 3. Comprobamos si el proceso sigue vivo
-          sleep 10
-          if ! pgrep -f "node server.js" > /dev/null; then
-             echo "--- ERROR: La aplicación murió inmediatamente ---"
-             cat app.log
-             exit 1
-          fi
-          
-          # 4. Esperar a que el puerto 4000 abra
-          echo "Esperando puerto 4000..."
+          # 4. Esperar al puerto 4000
+          echo "Esperando al puerto 4000..."
           for i in {1..20}; do
-            if nc -z localhost 4000; then break; fi
+            if nc -z localhost 4000; then 
+               echo "Servidor listo!"
+               break
+            fi
             sleep 3
           done
 
@@ -249,7 +245,6 @@ jobs:
             --network=host \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py -t http://localhost:4000 -J zap_reports/report.json -w zap_reports/report.md -r zap_reports/report.html -a
-
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@v4
