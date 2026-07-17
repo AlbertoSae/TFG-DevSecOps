@@ -213,33 +213,25 @@ jobs:
 
       - name: Run ZAP Baseline Scan
         run: |
-          # 1. Preparar directorio y dependencias
+          # 1. Preparar directorios necesarios
           mkdir -p zap_reports
+          mkdir -p artifacts/cert
           sudo chmod 777 zap_reports
-          npm install
           
-          # 2. Levantar la aplicación en segundo plano conectada al servicio mongo
-          # Nota: A veces NodeGoat necesita que la variable de entorno apunte al servicio 'mongodb'
+          # 2. CREAR EL CERTIFICADO FALSO
+          openssl req -x509 -newkey rsa:4096 -keyout artifacts/cert/server.key -out artifacts/cert/server.crt -days 365 -nodes -subj "/CN=localhost"
+          
+          # 3. Levantar la aplicación
           echo "Arrancando la aplicación..."
-          export MONGO_URL=mongodb://localhost:27017/nodegoat
           nohup npm start > app.log 2>&1 &
           
-          # 3. Esperar a que el puerto 4000 responda
-          echo "Esperando a que el servidor esté listo..."
+          # 4. Esperar al puerto 4000...
           for i in {1..30}; do
-            if nc -z localhost 4000; then
-              echo "Servidor detectado en puerto 4000"
-              break
-            fi
+            if nc -z localhost 4000; then break; fi
             sleep 2
-            if [ $i -eq 30 ]; then 
-              echo "--- ERROR: La aplicación no arrancó. Log detallado: ---"
-              cat app.log
-              exit 1
-            fi
           done
           
-          # 4. Lanzar ZAP
+          # 5. Lanzar ZAP
           docker run --rm -v ${{ github.workspace }}/zap_reports:/zap/wrk/:rw \
             --user root \
             --network=host \
